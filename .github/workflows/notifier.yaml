@@ -25,6 +25,9 @@ jobs:
               filtered_repos+=("$repo")
             fi
           done
+          for element in $filtered_repos; do
+            echo "- $element" 
+          done
           echo "filtered_repos=$(jq -cn --argjson repos "$(printf '%s\n' "${filtered_repos[@]}" | jq -R . | jq -s .)" '$repos')" >> $GITHUB_OUTPUT  
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
