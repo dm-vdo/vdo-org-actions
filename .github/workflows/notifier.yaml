@@ -44,9 +44,9 @@ jobs:
           # This data can be any valid JSON from a previous step in the GitHub Action
           payload: |
             {
-              "PR_LINK_REVIEWS": "https://github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Arequired",
-              "PR_LINK_REPLIES": "https://github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Achanges_requested",
-              "PR_LINK_APPROVALS": "https://github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Aapproved"             
+              "PR_LINK_REVIEWS": "https://github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Arequired+&type=pullrequests",
+              "PR_LINK_REPLIES": "https://github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Achanges_requested+&type=pullrequests",
+              "PR_LINK_APPROVALS": "https://github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Aapproved+&type=pullrequests"             
             }
         env:
           REVIEW_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).needReview.search.issueCount }}
