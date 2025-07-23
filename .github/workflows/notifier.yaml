@@ -6,30 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  get-org-repos:
-    runs-on: ubuntu-latest
-    steps:
-      - name: get list of non-archived repos
-        id: get-repos
-        run: |
-          repos=$(gh repo list ${{env.ORG}} --no-archived --json name | jq -c 'map(.name)')
-          echo "repos=$repos" >> $GITHUB_OUTPUT        
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ORG: ${{ github.repository_owner }}
-    outputs:
-      repos: ${{ steps.get-repos.outputs.repos }}
-
   notify_schedule:
-    needs:
-      - get-org-repos
     env:
       ORG: ${{ github.repository_owner }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repo: ${{ fromJson(needs.get-org-repos.outputs.repos) }}
-      fail-fast: false
     steps:
       - name: Notify PRs Summary
         uses: octokit/graphql-action@v2.x
@@ -52,22 +32,21 @@ jobs:
               }
             }
           variables: |
-            reviewQuery: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:required"
-            feedbackQuery: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:changes_requested"
-            approvalQuery: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:approved"
+            reviewQuery: "org:${{env.ORG}} state:open is:pr -label:\"on hold\" draft:false review:required"
+            feedbackQuery: "org:${{env.ORG}} state:open is:pr -label:\"on hold\" draft:false review:changes_requested"
+            approvalQuery: "org:${{env.ORG}} state:open is:pr -label:\"on hold\" draft:false review:approved"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - uses: slackapi/slack-github-action@v1.24.0
-        #if: ${{ env.REVIEW_COUNT > 0 || env.REPLY_COUNT > 0 || env.APPROVE_COUNT > 0 }}
+        if: ${{ env.REVIEW_COUNT > 0 || env.REPLY_COUNT > 0 || env.APPROVE_COUNT > 0 }}
         with:
           # This data can be any valid JSON from a previous step in the GitHub Action
           payload: |
             {
-              "PR_MSG": "Number of PRs awaiting action in ${{matrix.repo}} : ",
-              "PR_LINK_REVIEWS": "https://github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Arequired",
-              "PR_LINK_REPLIES": "https://github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Achanges_requested",
-              "PR_LINK_APPROVALS": "https://github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Aapproved"             
+              "PR_LINK_REVIEWS": "https://github.com/?q=org:${{env.ORG}}+is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Arequired",
+              "PR_LINK_REPLIES": "https://github.com/?q=org:${{env.ORG}}+is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Achanges_requested",
+              "PR_LINK_APPROVALS": "https://github.com/?q=org:${{env.ORG}}+is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Aapproved"             
             }
         env:
           REVIEW_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).needReview.search.issueCount }}
