@@ -18,7 +18,7 @@ jobs:
       - name: Filter out archived repos
         id: filter-repos
         run: |
-          echo '${{ steps.get-org-repos.outputs.data }}' | \
+          echo '${{ steps.get-org-repos.outputs.repos }}' | \
           jq '[.[] | select(.archived == false)] | map(.name)' > repos.json
           echo "repos=$(cat repos.json)" >> $GITHUB_OUTPUT
     outputs:
