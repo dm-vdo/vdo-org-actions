@@ -31,51 +31,33 @@ jobs:
         repo: ${{ fromJson(needs.get-org-repos.outputs.repos) }}
       fail-fast: false
     steps:
-      - name: Notify PRs Needing Review
+      - name: Notify PRs Summary
         uses: octokit/graphql-action@v2.x
-        id: prs_need_review
+        id: prs_summary
         with:
           query: |
-            query needreview($queryString:String!) {
-              search(type: ISSUE, query: $queryString, last: 100) {
+            query allPRCounts(
+              $reviewQuery: String!,
+              $feedbackQuery: String!,
+              $approvalQuery: String!
+            ) {
+              needReview: search(type: ISSUE, query: $reviewQuery, last: 100) {
+                issueCount
+              }
+              withFeedback: search(type: ISSUE, query: $feedbackQuery, last: 100) {
+                issueCount
+              }
+              withApproval: search(type: ISSUE, query: $approvalQuery, last: 100) {
                 issueCount
               }
             }
           variables: |
-            queryString: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:required"
+            reviewQuery: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:required"
+            feedbackQuery: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:changes_requested"
+            approvalQuery: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:approved"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Notify PRs With Feedback
-        uses: octokit/graphql-action@v2.x
-        id: prs_with_feedback
-        with:
-          query: |
-            query withfeedback($queryString:String!) {
-              search(type: ISSUE, query: $queryString, last: 100) {
-                issueCount
-              }
-            }
-          variables: |
-            queryString: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:changes_requested"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Notify PRs With Approval
-        uses: octokit/graphql-action@v2.x
-        id: prs_with_approval
-        with:
-          query: |
-            query withapproval($queryString:String!) {
-              search(type: ISSUE, query: $queryString, last: 100) {
-                issueCount
-              }
-            }
-          variables: |
-            queryString: "repo:${{env.ORG}}/${{matrix.repo}} state:open is:pr -label:\"on hold\" draft:false review:approved"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          
       - uses: slackapi/slack-github-action@v1.24.0
         if: ${{ env.REVIEW_COUNT > 0 || env.REPLY_COUNT > 0 || env.APPROVE_COUNT > 0 }}
         with:
@@ -88,7 +70,7 @@ jobs:
               "PR_LINK_APPROVALS": "github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Aapproved"             
             }
         env:
-          REVIEW_COUNT: ${{ fromJSON(steps.prs_need_review.outputs.data).search.issueCount }}
-          REPLY_COUNT: ${{ fromJSON(steps.prs_with_feedback.outputs.data).search.issueCount }}
-          APPROVE_COUNT: ${{ fromJSON(steps.prs_with_approvals.outputs.data).search.issueCount }}         
+          REVIEW_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).needReview.search.issueCount }}
+          REPLY_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).withFeedback.search.issueCount }}
+          APPROVE_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).withApproval.search.issueCount }}         
           SLACK_WEBHOOK_URL: ${{ secrets.SLACKMSG_TEST }}
