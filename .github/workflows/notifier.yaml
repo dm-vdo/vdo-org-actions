@@ -19,7 +19,7 @@ jobs:
         run: |
           filtered_repos=()
           repos='${{ steps.get-org-repos.outputs.repos }}'
-          for repo in $(echo "$repos" | jq -r '.[]'); do
+          for repo in $(echo "${{env.ORG}}/$repos" | jq -r '.[]'); do
             archived=$(gh repo view "$repo" --json isArchived -q ".archived")
             if [ "$archived" = "false" ]; then
               filtered_repos+=("$repo")
@@ -28,6 +28,7 @@ jobs:
           echo "filtered_repos=$(jq -cn --argjson repos "$(printf '%s\n' "${filtered_repos[@]}" | jq -R . | jq -s .)" '$repos')" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ORG: ${{ github.repository_owner }}
     outputs:
       repos: ${{ steps.filter-repos.outputs.filtered_repos }}
 
