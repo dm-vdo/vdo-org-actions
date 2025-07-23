@@ -37,22 +37,34 @@ jobs:
             approvalQuery: "org:${{env.ORG}} state:open is:pr -label:\"on hold\" draft:false review:approved"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - uses: slackapi/slack-github-action@v1.24.0
-        if: ${{ env.REVIEW_COUNT > 0 || env.REPLY_COUNT > 0 || env.APPROVE_COUNT > 0 }}
+      # Set environment variables at job level for proper access
+      - name: Set PR counts
+        id: set_counts
+        run: |
+          REVIEW_COUNT="${{ fromJSON(steps.prs_summary.outputs.data).needReview.issueCount }}"
+          REPLY_COUNT="${{ fromJSON(steps.prs_summary.outputs.data).withFeedback.issueCount }}"
+          APPROVE_COUNT="${{ fromJSON(steps.prs_summary.outputs.data).withApproval.issueCount }}"
+
+          echo "REVIEW_COUNT=${REVIEW_COUNT}" >> $GITHUB_OUTPUT
+          echo "REPLY_COUNT=${REPLY_COUNT}" >> $GITHUB_OUTPUT
+          echo "APPROVE_COUNT=${APPROVE_COUNT}" >> $GITHUB_OUTPUT
+
+          echo "Review Count: ${REVIEW_COUNT}"
+          echo "Reply Count: ${REPLY_COUNT}"
+          echo "Approval Count: ${APPROVE_COUNT}"
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        if: ${{ steps.set_counts.outputs.REVIEW_COUNT > 0 || steps.set_counts.outputs.REPLY_COUNT > 0 || steps.set_counts.outputs.APPROVE_COUNT > 0 }}
         with:
-          # This data can be any valid JSON from a previous step in the GitHub Action
           payload: |
             {
-              "PR_MSG_REVIEWS": "${{env.REVIEW_COUNT}} PRs requesting a review",
-              "PR_MSG_REPLIES": "${{env.REPLY_COUNT}} PRs with review feedback",
-              "PR_MSG_APPROVALS": "${{env.APPROVE_COUNT}} PRs with review approval",              
-              "PR_LINK_REVIEWS": "github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Arequired+&type=pullrequests",
-              "PR_LINK_REPLIES": "github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Achanges_requested+&type=pullrequests",
-              "PR_LINK_APPROVALS": "github.com/search?q=org%3A${{env.ORG}}+type%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Aapproved+&type=pullrequests"             
+              "PR_MSG_REVIEWS": "${{ steps.set_counts.outputs.REVIEW_COUNT }} PRs requesting a review",
+              "PR_MSG_REPLIES": "${{ steps.set_counts.outputs.REPLY_COUNT }} PRs with review feedback",
+              "PR_MSG_APPROVALS": "${{ steps.set_counts.outputs.APPROVE_COUNT }} PRs with review approval",
+              "PR_LINK_REVIEWS": "https://github.com/search?q=org%3A${{env.ORG}}%20type%3Apr%20is%3Aopen%20-label%3A%22on%20hold%22%20draft%3Afalse%20review%3Arequired&type=pullrequests",
+              "PR_LINK_REPLIES": "https://github.com/search?q=org%3A${{env.ORG}}%20type%3Apr%20is%3Aopen%20-label%3A%22on%20hold%22%20draft%3Afalse%20review%3Achanges_requested&type=pullrequests",
+              "PR_LINK_APPROVALS": "https://github.com/search?q=org%3A${{env.ORG}}%20type%3Apr%20is%3Aopen%20-label%3A%22on%20hold%22%20draft%3Afalse%20review%3Aapproved&type=pullrequests"
             }
         env:
-          REVIEW_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).needReview.search.issueCount }}
-          REPLY_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).withFeedback.search.issueCount }}
-          APPROVE_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).withApproval.search.issueCount }}         
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACKMSG_TEST }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}          
