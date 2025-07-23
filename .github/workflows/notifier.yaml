@@ -39,7 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - uses: slackapi/slack-github-action@v1.24.0
-        if: ${{ env.REVIEW_COUNT > 0 || env.REPLY_COUNT > 0 || env.APPROVE_COUNT > 0 }}
+        if: ${{env.REVIEW_COUNT}} > 0 || ${{env.REPLY_COUNT}} > 0 || ${{env.APPROVE_COUNT}} > 0
         with:
           # This data can be any valid JSON from a previous step in the GitHub Action
           payload: |
