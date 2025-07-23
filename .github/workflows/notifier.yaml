@@ -12,7 +12,7 @@ jobs:
       - name: get list of non-archived repos
         id: get-repos
         run: |
-          repos=$(gh repo list ${{env.ORG}} --no-archived --json name -q '.[].name' | paste -sd "," -)
+          repos=$(gh repo list ${{env.ORG}} --no-archived --json name -q '.[].name' | jq -c .)
           echo "repos=$repos" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
