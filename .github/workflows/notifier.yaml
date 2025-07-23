@@ -22,7 +22,7 @@ jobs:
           jq '[.[] | select(.archived == false)] | map(.name)' > repos.json
           echo "repos=$(cat repos.json)" >> $GITHUB_OUTPUT
     outputs:
-      repos: ${{ steps.filter-get-org-repos.outputs.repos }}
+      repos: ${{ steps.filter-repos.outputs.repos }}
 
   notify_schedule:
     needs:
