@@ -32,9 +32,9 @@ jobs:
               }
             }
           variables: |
-            reviewQuery: "org:${{env.ORG}} state:open is:pr -label:\"on hold\" draft:false review:required"
-            feedbackQuery: "org:${{env.ORG}} state:open is:pr -label:\"on hold\" draft:false review:changes_requested"
-            approvalQuery: "org:${{env.ORG}} state:open is:pr -label:\"on hold\" draft:false review:approved"
+            reviewQuery: "org:${{env.ORG}} repo:vdo-devel state:open is:pr -label:\"on hold\" draft:false review:required"
+            feedbackQuery: "org:${{env.ORG}} repo:vdo-devel state:open is:pr -label:\"on hold\" draft:false review:changes_requested"
+            approvalQuery: "org:${{env.ORG}} repo:vdo-devel state:open is:pr -label:\"on hold\" draft:false review:approved"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
