@@ -9,29 +9,16 @@ jobs:
   get-org-repos:
     runs-on: ubuntu-latest
     steps:
-      - uses: austenstone/get-org-repos@main
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: get list of non-archived repos
         id: get-org-repos
-
-      - name: Filter out archived repos
-        id: filter-repos
         run: |
-          filtered_repos=()
-          repos='${{ steps.get-org-repos.outputs.repos }}'
-          for repo in $(echo "$repos" | jq -r '.[]'); do
-            archived=$(gh repo view "${{env.ORG}}/$repo" --json isArchived -q ".archived")
-            if [ "$archived" = "false" ]; then
-              echo $repo
-              filtered_repos+=("$repo")
-            fi
-          done
-          echo "filtered_repos=$(jq -cn --argjson repos "$(printf '%s\n' "${filtered_repos[@]}" | jq -R . | jq -s .)" '$repos')" >> $GITHUB_OUTPUT  
+          repos=$(gh repo list ${{env.ORG}} --no-archived --json name -q '.[].name' | paste -sd "," -)
+          echo "repos=$repos" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG: ${{ github.repository_owner }}
     outputs:
-      repos: ${{ steps.filter-repos.outputs.filtered_repos }}
+      repos: ${{ steps.get-org-repos.outputs.repos }}
 
   notify_schedule:
     needs:
