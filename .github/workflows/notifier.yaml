@@ -22,11 +22,9 @@ jobs:
           for repo in $(echo "$repos" | jq -r '.[]'); do
             archived=$(gh repo view "${{env.ORG}}/$repo" --json isArchived -q ".archived")
             if [ "$archived" = "false" ]; then
+              echo $repo
               filtered_repos+=("$repo")
             fi
-          done
-          for element in $filtered_repos; do
-            echo "- $element" 
           done
           echo "filtered_repos=$(jq -cn --argjson repos "$(printf '%s\n' "${filtered_repos[@]}" | jq -R . | jq -s .)" '$repos')" >> $GITHUB_OUTPUT  
         env:
