@@ -65,9 +65,9 @@ jobs:
           payload: |
             {
               "PR_MSG": "Number of PRs awaiting action in ${{matrix.repo}} : ",
-              "PR_LINK_REVIEWS": "github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Arequired",
-              "PR_LINK_REPLIES": "github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Achanges_requested",
-              "PR_LINK_APPROVALS": "github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Aapproved"             
+              "PR_LINK_REVIEWS": "https://github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Arequired",
+              "PR_LINK_REPLIES": "https://github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Achanges_requested",
+              "PR_LINK_APPROVALS": "https://github.com/${{env.ORG}}/${{matrix.repo}}/pulls?q=is%3Apr+is%3Aopen+-label%3A%22on%20hold%22+draft%3Afalse+review%3Aapproved"             
             }
         env:
           REVIEW_COUNT: ${{ fromJSON(steps.prs_summary.outputs.data).needReview.search.issueCount }}
