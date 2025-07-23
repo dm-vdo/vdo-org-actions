@@ -37,6 +37,7 @@ jobs:
             approvalQuery: "org:${{env.ORG}} state:open is:pr -label:\"on hold\" draft:false review:approved"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       # Set environment variables at job level for proper access
       - name: Set PR counts
         id: set_counts
