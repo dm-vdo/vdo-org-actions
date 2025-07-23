@@ -25,8 +25,8 @@ jobs:
               filtered_repos+=("$repo")
             fi
           done
-          echo "filtered repos = ${{ filtered_repos }}"
           echo "filtered_repos=$(jq -cn --argjson repos "$(printf '%s\n' "${filtered_repos[@]}" | jq -R . | jq -s .)" '$repos')" >> $GITHUB_OUTPUT
+          echo "::set-output name=filtered_repos_json::$filtered_repos" # Set step output as JSON string        
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG: ${{ github.repository_owner }}
