@@ -68,4 +68,4 @@ jobs:
               "PR_LINK_APPROVALS": "https://github.com/search?q=org%3A${{env.ORG}}%20type%3Apr%20is%3Aopen%20-label%3A%22on%20hold%22%20draft%3Afalse%20review%3Aapproved&type=pullrequests"
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}          
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACKMSG_TEST }}          
