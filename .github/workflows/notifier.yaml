@@ -29,7 +29,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
-      repos: ${{ steps.filter-repos.outputs.repos }}
+      repos: ${{ steps.filter-repos.outputs.filtered_repos }}
 
   notify_schedule:
     needs:
