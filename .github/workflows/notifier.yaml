@@ -90,5 +90,5 @@ jobs:
         env:
           REVIEW_COUNT: ${{ fromJSON(steps.prs_need_review.outputs.data).search.issueCount }}
           REPLY_COUNT: ${{ fromJSON(steps.prs_with_feedback.outputs.data).search.issueCount }}
-          APPROVE_COUNT: ${{ fromJSON(steps.prs_need_approvals.outputs.data).search.issueCount }}         
+          APPROVE_COUNT: ${{ fromJSON(steps.prs_with_approvals.outputs.data).search.issueCount }}         
           SLACK_WEBHOOK_URL: ${{ secrets.SLACKMSG_TEST }}
