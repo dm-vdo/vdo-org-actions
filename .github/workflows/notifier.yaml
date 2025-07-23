@@ -26,6 +26,7 @@ jobs:
             fi
           done
           echo "filtered_repos=$(jq -cn --argjson repos "$(printf '%s\n' "${filtered_repos[@]}" | jq -R . | jq -s .)" '$repos')" >> $GITHUB_OUTPUT
+          echo "${{ steps.filter-repos.outputs.filtered_repos }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG: ${{ github.repository_owner }}
