@@ -19,8 +19,8 @@ jobs:
         run: |
           filtered_repos=()
           repos='${{ steps.get-org-repos.outputs.repos }}'
-          for repo in $(echo "${{env.ORG}}/$repos" | jq -r '.[]'); do
-            archived=$(gh repo view "$repo" --json isArchived -q ".archived")
+          for repo in $(echo "$repos" | jq -r '.[]'); do
+            archived=$(gh repo view "${{env.ORG}}/$repo" --json isArchived -q ".archived")
             if [ "$archived" = "false" ]; then
               filtered_repos+=("$repo")
             fi
