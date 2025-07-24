@@ -58,7 +58,7 @@ jobs:
         uses: slackapi/slack-github-action@v2.0.0
         if: ${{ steps.set_counts.outputs.REVIEW_COUNT > 0 || steps.set_counts.outputs.REPLY_COUNT > 0 || steps.set_counts.outputs.APPROVE_COUNT > 0 }}
         with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook: ${{ secrets.SLACKMSG_TEST }}
           webhook-type: webhook-trigger
           payload: |
             {
