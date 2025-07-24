@@ -55,9 +55,11 @@ jobs:
           echo "Approval Count: ${APPROVE_COUNT}"
 
       - name: Send Slack notification
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@v2
         if: ${{ steps.set_counts.outputs.REVIEW_COUNT > 0 || steps.set_counts.outputs.REPLY_COUNT > 0 || steps.set_counts.outputs.APPROVE_COUNT > 0 }}
         with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
           payload: |
             {
               "unfurl_links": false,
@@ -69,5 +71,3 @@ jobs:
               "PR_LINK_REPLIES": "github.com/search?q=org%3A${{env.ORG}}%20type%3Apr%20is%3Aopen%20-label%3A%22on%20hold%22%20draft%3Afalse%20review%3Achanges_requested&type=pullrequests",
               "PR_LINK_APPROVALS": "github.com/search?q=org%3A${{env.ORG}}%20type%3Apr%20is%3Aopen%20-label%3A%22on%20hold%22%20draft%3Afalse%20review%3Aapproved&type=pullrequests"
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACKMSG_TEST }}          
