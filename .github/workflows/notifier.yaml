@@ -61,8 +61,8 @@ jobs:
           webhook: ${{ secrets.SLACKMSG_TEST }}
           webhook-type: webhook-trigger
           payload: |
-              unfurl_links : false,
-              unfurl_media : false,           
+              "unfurl_links" : false,
+              "unfurl_media" : false,           
               "PR_MSG_REVIEWS" : "${{ steps.set_counts.outputs.REVIEW_COUNT }} PRs requesting a review",
               "PR_MSG_REPLIES" : "${{ steps.set_counts.outputs.REPLY_COUNT }} PRs with review feedback",
               "PR_MSG_APPROVALS" : "${{ steps.set_counts.outputs.APPROVE_COUNT }} PRs with review approval",
