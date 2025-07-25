@@ -63,7 +63,7 @@ jobs:
           payload: |
               "unfurl_links" : false,
               "unfurl_media" : false,           
-              "PR_MSG_REVIEWS" : "${{ steps.set_counts.outputs.REVIEW_COUNT }} [Reviews](https://github.com/search?q=org%3A${{env.ORG}}%20type%3Apr%20is%3Aopen%20-label%3A%22on%20hold%22%20draft%3Afalse%20review%3Arequired&type=pullrequests)",
+              "PR_MSG_REVIEWS" : "${{ steps.set_counts.outputs.REVIEW_COUNT }} PRs requesting a review",
               "PR_MSG_REPLIES" : "${{ steps.set_counts.outputs.REPLY_COUNT }} PRs with review feedback",
               "PR_MSG_APPROVALS" : "${{ steps.set_counts.outputs.APPROVE_COUNT }} PRs with review approval",
               "PR_LINK_REVIEWS" : "https://github.com/search?q=org%3A${{env.ORG}}%20type%3Apr%20is%3Aopen%20-label%3A%22on%20hold%22%20draft%3Afalse%20review%3Arequired&type=pullrequests",
