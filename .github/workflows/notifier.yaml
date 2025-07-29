@@ -1,4 +1,4 @@
-name: Notify
+name: Notify All
 
 on:
   schedule:
