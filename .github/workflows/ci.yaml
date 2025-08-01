@@ -2,9 +2,6 @@ name: Common CI
 
 on:
   workflow_call:
-    secrets:
-      GITHUB_TOKEN:
-        required: true
     inputs:
       run-public-tests:
         description: "Whether to run public testing"
@@ -55,12 +52,12 @@ jobs:
       - name: Assign reviewers and assignees
         uses: dm-vdo/vdo-auto-assign@main
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
 
       - name: Remove all known labels
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ github.token }}
           labels: verification needed, untested, public testing running, public testing done, public testing failed, private testing running, private testing done, private testing failed
           type: remove
 
@@ -77,13 +74,13 @@ jobs:
         with:
           organization: dm-vdo
           username: ${{ github.actor }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
 
       - name: Add untested label
         if: ${{ steps.is_organization_member.outputs.result == 'true' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: untested
           type: add
 
@@ -91,7 +88,7 @@ jobs:
         if: ${{ steps.is_organization_member.outputs.result == 'false' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: verification needed
           type: add
 
@@ -100,7 +97,7 @@ jobs:
         uses: trstringer/manual-approval@v1
         timeout-minutes: 1440
         with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
+          secret: ${{ github.token }}
           approvers: bjohnsto, c2redhat, lorelei-sakai, raeburn, rhawalsh
           minimum-approvals: 1
           issue-title: "Verifying pull request for testing"
@@ -111,7 +108,7 @@ jobs:
         if: ${{ steps.is_organization_member.outputs.result == 'false' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: verification needed
           type: remove
 
@@ -130,14 +127,14 @@ jobs:
       - name: Remove untested label
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: untested
           type: remove
 
       - name: Add testing running label
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: public testing running
           type: add
 
@@ -152,7 +149,7 @@ jobs:
         if: always()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: public testing running
           type: remove
 
@@ -160,7 +157,7 @@ jobs:
         if: success()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: public testing done
           type: add
 
@@ -168,7 +165,7 @@ jobs:
         if: failure()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: public testing failed
           type: add
 
@@ -201,14 +198,14 @@ jobs:
       - name: Remove public testing success
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: public testing done
           type: remove
 
       - name: Add testing running label
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: private testing running
           type: add
 
@@ -223,7 +220,7 @@ jobs:
         if: always()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: private testing running
           type: remove
 
@@ -231,7 +228,7 @@ jobs:
         if: success()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: private testing done
           type: add
           
@@ -239,6 +236,6 @@ jobs:
         if: failure()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           label: private testing failed        
           type: add
