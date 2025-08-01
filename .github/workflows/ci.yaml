@@ -31,12 +31,6 @@ on:
         required: false
         default: echo "You must specify an action to run when private testing fails"
         type: string     
-
-# This allows a subsequently queued workflow run to interrupt previous runs
-concurrency:
-  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
-  cancel-in-progress: true
-
 env:
   LOGFILE: logs-${{ github.event.repository.owner.login }}-${{ github.event.repository.name }}-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
 
