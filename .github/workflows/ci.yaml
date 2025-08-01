@@ -2,9 +2,6 @@ name: Common CI
 
 on:
   workflow_call:
-    secrets:
-      VDODEVEL:
-        required: true     
     inputs:
       run-public-tests:
         description: "Whether to run public testing"
