@@ -2,6 +2,9 @@ name: Common CI
 
 on:
   workflow_call:
+    secrets:
+      VDODEVEL:
+        required: true     
     inputs:
       run-public-tests:
         description: "Whether to run public testing"
@@ -30,7 +33,9 @@ on:
         description: "What action to run for private testing"
         required: false
         default: echo "You must specify an action to run when private testing fails"
-        type: string     
+        type: string
+      secrets:
+    
 env:
   LOGFILE: logs-${{ github.event.repository.owner.login }}-${{ github.event.repository.name }}-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
 
