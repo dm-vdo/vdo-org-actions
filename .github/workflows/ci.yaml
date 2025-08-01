@@ -243,7 +243,5 @@ jobs:
         uses: buildsville/add-remove-label@v2.0.0
         with:
           token: ${{secrets.GITHUB_TOKEN}}
-          label: private testing failed
-          
+          label: private testing failed        
           type: add
-
