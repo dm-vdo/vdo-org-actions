@@ -1,9 +1,6 @@
 name: Common CI
 
 on:
-  secrets:
-    VDODEVEL: 
-      required: true
   workflow_call:
     inputs:
       run-public-tests:
@@ -84,7 +81,7 @@ jobs:
         if: ${{ steps.is_organization_member.outputs.result == 'true' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.VDODEVEL}}
+          token: ${{secrets.GITHUB_TOKEN}}
           label: untested
           type: add
 
@@ -92,7 +89,7 @@ jobs:
         if: ${{ steps.is_organization_member.outputs.result == 'false' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.VDODEVEL}}
+          token: ${{secrets.GITHUB_TOKEN}}
           label: verification needed
           type: add
 
@@ -101,7 +98,7 @@ jobs:
         uses: trstringer/manual-approval@v1
         timeout-minutes: 1440
         with:
-          secret: ${{ secrets.VDODEVEL }}
+          secret: ${{ secrets.GITHUB_TOKEN }}
           approvers: bjohnsto, c2redhat, lorelei-sakai, raeburn, rhawalsh
           minimum-approvals: 1
           issue-title: "Verifying pull request for testing"
@@ -112,7 +109,7 @@ jobs:
         if: ${{ steps.is_organization_member.outputs.result == 'false' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.VDODEVEL}}
+          token: ${{secrets.GITHUB_TOKEN}}
           label: verification needed
           type: remove
 
@@ -232,7 +229,7 @@ jobs:
         if: success()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.VDODEVEL}}
+          token: ${{secrets.GITHUB_TOKEN}}
           label: private testing done
           type: add
           
