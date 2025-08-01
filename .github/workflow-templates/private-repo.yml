@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   run-common-ci:
-    uses: dm=vdo/vdo-org-actions/.github/workflows/ci.yml@main
+    uses: dm-vdo/vdo-org-actions/.github/workflows/ci.yml@main
     with:
       run-public-tests: false
       run-private-tests: true
