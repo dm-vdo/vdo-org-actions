@@ -1,6 +1,9 @@
 name: Common CI
 
 on:
+  secrets:
+    VDODEVEL: 
+      required: true
   workflow_call:
     inputs:
       run-public-tests:
