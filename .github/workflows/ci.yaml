@@ -34,7 +34,6 @@ on:
         required: false
         default: echo "You must specify an action to run when private testing fails"
         type: string
-      secrets:
     
 env:
   LOGFILE: logs-${{ github.event.repository.owner.login }}-${{ github.event.repository.name }}-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
