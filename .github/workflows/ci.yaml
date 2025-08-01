@@ -81,7 +81,7 @@ jobs:
         if: ${{ steps.is_organization_member.outputs.result == 'true' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: untested
           type: add
 
@@ -89,7 +89,7 @@ jobs:
         if: ${{ steps.is_organization_member.outputs.result == 'false' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: verification needed
           type: add
 
@@ -109,7 +109,7 @@ jobs:
         if: ${{ steps.is_organization_member.outputs.result == 'false' }}
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: verification needed
           type: remove
 
@@ -128,14 +128,14 @@ jobs:
       - name: Remove untested label
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: untested
           type: remove
 
       - name: Add testing running label
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: public testing running
           type: add
 
@@ -150,7 +150,7 @@ jobs:
         if: always()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: public testing running
           type: remove
 
@@ -158,7 +158,7 @@ jobs:
         if: success()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: public testing done
           type: add
 
@@ -166,7 +166,7 @@ jobs:
         if: failure()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: public testing failed
           type: add
 
@@ -199,14 +199,14 @@ jobs:
       - name: Remove public testing success
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: public testing done
           type: remove
 
       - name: Add testing running label
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: private testing running
           type: add
 
@@ -221,7 +221,7 @@ jobs:
         if: always()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: private testing running
           type: remove
 
@@ -229,7 +229,7 @@ jobs:
         if: success()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: private testing done
           type: add
           
@@ -237,6 +237,6 @@ jobs:
         if: failure()
         uses: buildsville/add-remove-label@v2.0.0
         with:
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{ secrets.GITHUB_TOKEN }}
           label: private testing failed        
           type: add
