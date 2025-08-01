@@ -29,8 +29,7 @@ on:
       private-tests-action-failure:
         description: "What action to run for private testing"
         required: false
-        default: |
-          cp -a logs /permabit/user/bunsen/artifacts/${{ env.LOGFILE }}
+        default: echo "You must specify an action to run when private testing fails"
         type: string     
 
 # This allows a subsequently queued workflow run to interrupt previous runs
