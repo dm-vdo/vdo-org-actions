@@ -1,9 +1,37 @@
 name: Common CI
 
 on:
-  pull_request_target:
-    types: [ opened, reopened, ready_for_review, synchronize ]
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      run-public-tests:
+        description: "Whether to run public testing"
+        required: true
+        type: boolean
+      public-test-action:
+        description: "What action to run for public testing"
+        required: false
+        default: echo "You must specify an action to run for public testing"    
+        type: string
+      public-test-action-failure:
+        description: "What action to run for private testing"
+        required: false
+        default: echo "You must specify an action to run when public testing fails"
+        type: string     
+      run-private-tests:
+        description: "Whether to run private testing"
+        required: true
+        type: boolean
+      private-test-action:
+        description: "What action to run for private testing"
+        required: false
+        default: echo "You must specify an action to run for private testing"
+        type: string
+      private-test-action-failure:
+        description: "What action to run for private testing"
+        required: false
+        default: |
+          cp -a logs /permabit/user/bunsen/artifacts/${{ env.LOGFILE }}
+        type: string     
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -91,7 +119,7 @@ jobs:
           type: remove
 
   Public-Testing:
-    if: github.event.pull_request.draft == false
+    if: ${{ inputs.run-public-tests || github.event.pull_request.draft == false }}
     runs-on: [self-hosted, untrusted]
     needs: [Verifying]
     steps:
@@ -102,13 +130,6 @@ jobs:
       - name: Start testing
         run: echo Testing Start
 
-      - name: Add testing running label
-        uses: buildsville/add-remove-label@v2.0.0
-        with:
-          token: ${{secrets.GITHUB_TOKEN}}
-          label: public testing running
-          type: add
-
       - name: Remove untested label
         uses: buildsville/add-remove-label@v2.0.0
         with:
@@ -116,9 +137,19 @@ jobs:
           label: untested
           type: remove
 
-      - name: Run-Untrusted-Tests
-        run: |
-          make oss-jenkins
+      - name: Add testing running label
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          label: public testing running
+          type: add
+
+      - name: Public testing action
+        run: ${{ inputs.public-tests-action }}
+
+      - name: Public testing failure action
+        if: failure()
+        run: ${{ inputs.public-test-fail-action }}
 
       - name: Remove public testing running label
         if: always()
@@ -127,6 +158,14 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           label: public testing running
           type: remove
+
+      - name: Add public testing success
+        if: success()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          label: public testing done
+          type: add
 
       - name: Add public testing failed
         if: failure()
@@ -142,25 +181,6 @@ jobs:
         with:
           files: logs/**/*.xml
 
-      - name: Prepare logfiles
-        if: failure()
-        run: |
-          cd logs
-          for i in *;
-          do
-            if [ -d "$i" ]; then
-              cd $i
-              for file in *::*.log;
-              do
-                [ -e "$file" ] || continue
-                mv "${file}" "${file/::/--}"
-              done
-              cd ..
-            else
-              mv "${i}" "${i/::/--}"
-            fi
-          done
-
       - name: Upload logfiles
         if: failure()
         uses: actions/upload-artifact@v4
@@ -169,16 +189,8 @@ jobs:
           path: logs/*/*.log
           retention-days: 5
 
-      - name: Add public testing success
-        if: success()
-        uses: buildsville/add-remove-label@v2.0.0
-        with:
-          token: ${{secrets.GITHUB_TOKEN}}
-          label: public testing done
-          type: add
-
   Private-Testing:
-    if: github.event.pull_request.draft == false
+    if: ${{ inputs.run-private-tests || github.event.pull_request.draft == false }}
     runs-on: [self-hosted, trusted]
     needs: [Verifying, Public-Testing]
     steps:
@@ -189,7 +201,7 @@ jobs:
       - name: Start Private testing
         run: echo Private Testing Start
 
-      - name: Add public testing success
+      - name: Remove public testing success
         uses: buildsville/add-remove-label@v2.0.0
         with:
           token: ${{secrets.GITHUB_TOKEN}}
@@ -203,13 +215,12 @@ jobs:
           label: private testing running
           type: add
 
-      - name: Run-trusted-Tests
-        run: make jenkins
+      - name: Private testing action
+        run: ${{ inputs.private-tests-action }}
 
       - name: Copy log file to /permatbit/user/bunsen/artifacts
         if: failure()
-        run: |
-          cp -a logs /permabit/user/bunsen/artifacts/${{ env.LOGFILE }}
+        run: ${{ inputs.private-tests-action-failure }}
 
       - name: Remove private testing running label
         if: always()
@@ -219,14 +230,6 @@ jobs:
           label: private testing running
           type: remove
 
-      - name: Add private testing failed
-        if: failure()
-        uses: buildsville/add-remove-label@v2.0.0
-        with:
-          token: ${{secrets.GITHUB_TOKEN}}
-          label: private testing failed
-          type: add
-
       - name: Add private testing success
         if: success()
         uses: buildsville/add-remove-label@v2.0.0
@@ -234,3 +237,13 @@ jobs:
           token: ${{secrets.VDODEVEL}}
           label: private testing done
           type: add
+          
+      - name: Add private testing failed
+        if: failure()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          label: private testing failed
+          
+          type: add
+
