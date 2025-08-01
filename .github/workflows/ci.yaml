@@ -7,12 +7,12 @@ on:
         description: "Whether to run public testing"
         required: true
         type: boolean
-      public-test-action:
+      public-tests-action:
         description: "What action to run for public testing"
         required: false
         default: echo "You must specify an action to run for public testing"    
         type: string
-      public-test-action-failure:
+      public-tests-action-failure:
         description: "What action to run for private testing"
         required: false
         default: echo "You must specify an action to run when public testing fails"
@@ -21,12 +21,12 @@ on:
         description: "Whether to run private testing"
         required: true
         type: boolean
-      private-test-action:
+      private-tests-action:
         description: "What action to run for private testing"
         required: false
         default: echo "You must specify an action to run for private testing"
         type: string
-      private-test-action-failure:
+      private-tests-action-failure:
         description: "What action to run for private testing"
         required: false
         default: |
@@ -149,7 +149,7 @@ jobs:
 
       - name: Public testing failure action
         if: failure()
-        run: ${{ inputs.public-test-fail-action }}
+        run: ${{ inputs.public-tests-fail-action }}
 
       - name: Remove public testing running label
         if: always()
