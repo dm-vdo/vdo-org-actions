@@ -8,12 +8,12 @@ on:
         required: true
         type: boolean
       public-tests-action:
-        description: "What action to run for public testing"
+        description: "What actions to run for public testing"
         required: false
         default: echo "You must specify an action to run for public testing"    
         type: string
       public-tests-action-failure:
-        description: "What action to run for private testing"
+        description: "What actions to run if private testing fails"
         required: false
         default: echo "You must specify an action to run when public testing fails"
         type: string     
@@ -22,12 +22,12 @@ on:
         required: true
         type: boolean
       private-tests-action:
-        description: "What action to run for private testing"
+        description: "What actions to run for private testing"
         required: false
         default: echo "You must specify an action to run for private testing"
         type: string
       private-tests-action-failure:
-        description: "What action to run for private testing"
+        description: "What actions to run if private testing fails"
         required: false
         default: echo "You must specify an action to run when private testing fails"
         type: string
