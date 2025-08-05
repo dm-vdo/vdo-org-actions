@@ -13,7 +13,7 @@ on:
         default: echo "You must specify an action to run for public testing"    
         type: string
       public-tests-action-failure:
-        description: "What actions to run if private testing fails"
+        description: "What actions to run if public testing fails"
         required: false
         default: echo "You must specify an action to run when public testing fails"
         type: string     
