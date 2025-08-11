@@ -1,0 +1,75 @@
+name: Common Deployment
+
+on:
+  workflow_call:
+    inputs:
+      deploy-action:
+        description: "What actions to run for the deploy stage"
+        required: false
+        default: echo "No deploy stage action specified"
+        type: string
+      deploy-action-failure:
+        description: "What actions to run if the deploy stage fails"
+        required: false
+        default: echo "No deploy failure action specified"
+        type: string
+
+jobs:
+  Starting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Display Start Info
+        run: |
+          echo Deployment starting for the following:
+          echo org: ${{ github.event.repository.owner.login }}
+          echo repo: ${{ github.event.repository.name }}
+          echo pr: ${{ github.event.pull_request.number }}:
+          echo commit: ${{ github.event.pull_request.head.sha }}
+          echo action: ${{ github.event.action }}
+
+  Deployment-Stage:
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: [self-hosted, trusted]
+    needs: [Public-Stage, Private-Stage]
+    steps:
+      - name: Start deployment
+        run: echo "Deploy Stage Starting"
+
+      - name: Add deployment running
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: deployment running
+          type: add
+
+      - name: Deployment action
+        run: ${{ inputs.deploy-action }}
+
+      - name: Deployment failure action
+        if: failure()
+        run: ${{ inputs.deploy-fail-action }}
+
+      - name: Remove Deployment running label
+        if: always()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: deployment running
+          type: remove
+
+      - name: Add deployment success
+        if: success()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: deployment done
+          type: add
+
+      - name: Add deployment failed
+        if: failure()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: deployment failed
+          type: add
+

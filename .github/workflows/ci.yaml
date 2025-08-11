@@ -1,37 +1,57 @@
-name: Common CI
+name: Common PR Validation
 
 on:
   workflow_call:
     inputs:
-      run-public-tests:
-        description: "Whether to run public testing"
+      run-public:
+        description: "Whether to run public build and testing stages"
         required: true
         type: boolean
-      public-tests-action:
-        description: "What actions to run for public testing"
+      public-build-action:
+        description: "What actions to run for the public build stage"
         required: false
-        default: echo "You must specify an action to run for public testing"    
+        default: echo "No public build stage action specified"
+        type: string
+      public-build-action-failure:
+        description: "What actions to run if the public build stage fails"
+        required: false
+        default: echo "No public build failure action specified"
+        type: string            
+      public-tests-action:
+        description: "What actions to run for the public testing stage"
+        required: false
+        default: echo "No public test stage action specified"
         type: string
       public-tests-action-failure:
-        description: "What actions to run if public testing fails"
+        description: "What actions to run if the public testing stage fails"
         required: false
-        default: echo "You must specify an action to run when public testing fails"
+        default: echo "No public testing failure action specified"
         type: string     
-      run-private-tests:
-        description: "Whether to run private testing"
+      run-private:
+        description: "Whether to run private build and testing stages"
         required: true
         type: boolean
-      private-tests-action:
-        description: "What actions to run for private testing"
+      private-build-action:
+        description: "What actions to run for the private build stage"
         required: false
-        default: echo "You must specify an action to run for private testing"
+        default: echo "No private build stage action specified"
+        type: string
+      private-build-action-failure:
+        description: "What actions to run if the private build stage fails"
+        required: false
+        default: echo "No private build failure action specified"
+        type: string        
+      private-tests-action:
+        description: "What actions to run for the private testing stage"
+        required: false
+        default: echo "No private testing stage action specified"
         type: string
       private-tests-action-failure:
-        description: "What actions to run if private testing fails"
+        description: "What actions to run if the private testing stage fails"
         required: false
-        default: echo "You must specify an action to run when private testing fails"
+        default: echo "No private testing failure action specified"
         type: string
-    
+
 env:
   LOGFILE: logs-${{ github.event.repository.owner.login }}-${{ github.event.repository.name }}-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
 
@@ -41,7 +61,7 @@ jobs:
     steps:
       - name: Display CI Info
         run: |
-          echo CI starting for the following:
+          echo PR validation starting for the following:
           echo org: ${{ github.event.repository.owner.login }}
           echo repo: ${{ github.event.repository.name }}
           echo pr: ${{ github.event.pull_request.number }}:
@@ -58,7 +78,7 @@ jobs:
         uses: buildsville/add-remove-label@v2.0.0
         with:
           token: ${{ github.token }}
-          labels: verification needed, untested, public testing running, public testing done, public testing failed, private testing running, private testing done, private testing failed
+          labels: verification needed, untested, public build running, public build done, public build failed, public testing running, public testing done, public testing failed, private build running, private build done, private build failed, private testing running, private testing done, private testing failed
           type: remove
 
   Verifying:
@@ -112,17 +132,17 @@ jobs:
           label: verification needed
           type: remove
 
-  Public-Testing:
-    if: ${{ inputs.run-public-tests || github.event.pull_request.draft == false }}
+  Public-Stage:
+    if: ${{ inputs.run-public || github.event.pull_request.draft == false }}
     runs-on: [self-hosted, untrusted]
     needs: [Verifying]
     steps:
+      - name: Start Public
+        run: echo "Public Stage Starting"
+
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Start testing
-        run: echo Testing Start
 
       - name: Remove untested label
         uses: buildsville/add-remove-label@v2.0.0
@@ -131,7 +151,45 @@ jobs:
           label: untested
           type: remove
 
-      - name: Add testing running label
+      - name: Add public build running
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: public build running
+          type: add
+
+      - name: Public build action
+        run: ${{ inputs.public-build-action }}
+
+      - name: Public build failure action
+        if: failure()
+        run: ${{ inputs.public-build-fail-action }}
+
+      - name: Remove public build running label
+        if: always()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: public build running
+          type: remove
+
+      - name: Add public build success
+        if: success()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: public build done
+          type: add
+
+      - name: Add public build failed
+        if: failure()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: public build failed
+          type: add
+
+      - name: Add public testing running
         uses: buildsville/add-remove-label@v2.0.0
         with:
           token: ${{ github.token }}
@@ -183,26 +241,64 @@ jobs:
           path: logs/*/*.log
           retention-days: 5
 
-  Private-Testing:
-    if: ${{ inputs.run-private-tests || github.event.pull_request.draft == false }}
+  Private-Stage:
+    if: ${{ inputs.run-private || github.event.pull_request.draft == false }}
     runs-on: [self-hosted, trusted]
-    needs: [Verifying, Public-Testing]
+    needs: [Verifying]
     steps:
+      - name: Private Stage
+        run: echo "Private Stage Starting"
+
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Start Private testing
-        run: echo Private Testing Start
-
-      - name: Remove public testing success
+      - name: Remove untested label
         uses: buildsville/add-remove-label@v2.0.0
         with:
           token: ${{ github.token }}
-          label: public testing done
+          label: untested
           type: remove
 
-      - name: Add testing running label
+      - name: Add private build running
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: private build running
+          type: add
+
+      - name: Private build action
+        run: ${{ inputs.private-build-action }}
+
+      - name: Private build failure action
+        if: failure()
+        run: ${{ inputs.private-build-fail-action }}
+
+      - name: Remove private build running label
+        if: always()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: private build running
+          type: remove
+
+      - name: Add private build success
+        if: success()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: private build done
+          type: add
+
+      - name: Add private build failed
+        if: failure()
+        uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{ github.token }}
+          label: private build failed
+          type: add
+
+      - name: Add private testing running label
         uses: buildsville/add-remove-label@v2.0.0
         with:
           token: ${{ github.token }}
@@ -212,7 +308,7 @@ jobs:
       - name: Private testing action
         run: ${{ inputs.private-tests-action }}
 
-      - name: Copy log file to /permatbit/user/bunsen/artifacts
+      - name: Private testing failure action
         if: failure()
         run: ${{ inputs.private-tests-action-failure }}
 
@@ -231,11 +327,12 @@ jobs:
           token: ${{ github.token }}
           label: private testing done
           type: add
-          
+
       - name: Add private testing failed
         if: failure()
         uses: buildsville/add-remove-label@v2.0.0
         with:
           token: ${{ github.token }}
-          label: private testing failed        
+          label: private testing failed
           type: add
+
