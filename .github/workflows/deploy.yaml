@@ -30,7 +30,6 @@ jobs:
   Deployment-Stage:
     if: ${{ github.event.pull_request.draft == false }}
     runs-on: [self-hosted, trusted]
-    needs: [Public-Stage, Private-Stage]
     steps:
       - name: Start deployment
         run: echo "Deploy Stage Starting"
