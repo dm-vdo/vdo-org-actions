@@ -3,6 +3,10 @@ name: Common PR Validation
 on:
   workflow_call:
     inputs:
+      logfile:
+        description: "The file to write logs to"
+        required: true
+        type: string
       run-public:
         description: "Whether to run public build and testing stages"
         required: true
@@ -51,9 +55,6 @@ on:
         required: false
         default: echo "No private testing failure action specified"
         type: string
-
-env:
-  LOGFILE: logs-${{ github.event.repository.owner.login }}-${{ github.event.repository.name }}-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
 
 jobs:
   Starting:
@@ -237,7 +238,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.LOGFILE }}
+          name: ${{ inputs.LOGFILE }}
           path: logs/*/*.log
           retention-days: 5
 
