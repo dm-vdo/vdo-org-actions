@@ -337,3 +337,8 @@ jobs:
           label: private testing failed
           type: add
 
+      - name: Copy logfiles
+        if: failure()
+        run: |
+          cp -a logs /permabit/user/bunsen/artifacts/${{ inputs.logfile }}
+
