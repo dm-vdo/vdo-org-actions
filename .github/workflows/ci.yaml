@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       run-public-build:
-        description: "Whether to run public build stage"
+        description: "Whether to run the public build stage"
         required: true
         type: boolean
       public-build-action:
@@ -21,8 +21,8 @@ on:
         required: false
         default: echo "No public build failure action specified"
         type: string
-      run-public-test:
-        description: "Whether to run public test stage"
+      run-public-tests:
+        description: "Whether to run the public testing stage"
         required: true
         type: boolean        
       public-tests-action:
@@ -36,7 +36,7 @@ on:
         default: echo "No public testing failure action specified"
         type: string     
       run-private-build:
-        description: "Whether to run private build stage"
+        description: "Whether to run the private build stage"
         required: true
         type: boolean
       private-build-action:
@@ -49,8 +49,8 @@ on:
         required: false
         default: echo "No private build failure action specified"
         type: string        
-      run-private-test:
-        description: "Whether to run private test stage"
+      run-private-tests:
+        description: "Whether to run the private testing stage"
         required: true
         type: boolean        
       private-tests-action:
@@ -199,12 +199,12 @@ jobs:
           type: add
 
   Public-Test-Stage:
-    if: ${{ inputs.run-public-test || github.event.pull_request.draft == false }}
+    if: ${{ inputs.run-public-tests || github.event.pull_request.draft == false }}
     runs-on: [self-hosted, untrusted]
     needs: [Verifying, Public-Build-Stage]
     steps:
       - name: Start Public
-        run: echo "Public Test Stage Starting"
+        run: echo "Public Testing Stage Starting"
 
       - name: Add public testing running
         uses: buildsville/add-remove-label@v2.0.0
@@ -316,12 +316,12 @@ jobs:
           type: add
 
   Private-Test-Stage:
-    if: ${{ inputs.run-private-test || github.event.pull_request.draft == false }}
+    if: ${{ inputs.run-private-tests || github.event.pull_request.draft == false }}
     runs-on: [self-hosted, trusted]
     needs: [Verifying, Private-Build-Stage]
     steps:
       - name: Start Public
-        run: echo "Private Test Stage Starting"
+        run: echo "Private Testing Stage Starting"
 
       - name: Add private testing running label
         uses: buildsville/add-remove-label@v2.0.0
