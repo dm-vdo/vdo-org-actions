@@ -7,8 +7,8 @@ on:
         description: "The file to write logs to"
         required: true
         type: string
-      run-public:
-        description: "Whether to run public build and testing stages"
+      run-public-build:
+        description: "Whether to run public build stage"
         required: true
         type: boolean
       public-build-action:
@@ -20,7 +20,11 @@ on:
         description: "What actions to run if the public build stage fails"
         required: false
         default: echo "No public build failure action specified"
-        type: string            
+        type: string
+      run-public-test:
+        description: "Whether to run public test stage"
+        required: true
+        type: boolean        
       public-tests-action:
         description: "What actions to run for the public testing stage"
         required: false
@@ -31,8 +35,8 @@ on:
         required: false
         default: echo "No public testing failure action specified"
         type: string     
-      run-private:
-        description: "Whether to run private build and testing stages"
+      run-private-build:
+        description: "Whether to run private build stage"
         required: true
         type: boolean
       private-build-action:
@@ -45,6 +49,10 @@ on:
         required: false
         default: echo "No private build failure action specified"
         type: string        
+      run-private-test:
+        description: "Whether to run private test stage"
+        required: true
+        type: boolean        
       private-tests-action:
         description: "What actions to run for the private testing stage"
         required: false
@@ -133,13 +141,13 @@ jobs:
           label: verification needed
           type: remove
 
-  Public-Stage:
-    if: ${{ inputs.run-public || github.event.pull_request.draft == false }}
+  Public-Build-Stage:
+    if: ${{ inputs.run-public-build || github.event.pull_request.draft == false }}
     runs-on: [self-hosted, untrusted]
     needs: [Verifying]
     steps:
       - name: Start Public
-        run: echo "Public Stage Starting"
+        run: echo "Public Build Stage Starting"
 
       - uses: actions/checkout@v2
         with:
@@ -189,6 +197,14 @@ jobs:
           token: ${{ github.token }}
           label: public build failed
           type: add
+
+  Public-Test-Stage:
+    if: ${{ inputs.run-public-test || github.event.pull_request.draft == false }}
+    runs-on: [self-hosted, untrusted]
+    needs: [Verifying, Public-Build-Stage]
+    steps:
+      - name: Start Public
+        run: echo "Public Test Stage Starting"
 
       - name: Add public testing running
         uses: buildsville/add-remove-label@v2.0.0
@@ -242,13 +258,13 @@ jobs:
           path: logs/*/*.log
           retention-days: 5
 
-  Private-Stage:
-    if: ${{ inputs.run-private || github.event.pull_request.draft == false }}
+  Private-Build-Stage:
+    if: ${{ inputs.run-private-build || github.event.pull_request.draft == false }}
     runs-on: [self-hosted, trusted]
     needs: [Verifying]
     steps:
       - name: Private Stage
-        run: echo "Private Stage Starting"
+        run: echo "Private Build Stage Starting"
 
       - uses: actions/checkout@v2
         with:
@@ -299,6 +315,14 @@ jobs:
           label: private build failed
           type: add
 
+  Private-Test-Stage:
+    if: ${{ inputs.run-private-test || github.event.pull_request.draft == false }}
+    runs-on: [self-hosted, trusted]
+    needs: [Verifying, Private-Build-Stage]
+    steps:
+      - name: Start Public
+        run: echo "Private Test Stage Starting"
+
       - name: Add private testing running label
         uses: buildsville/add-remove-label@v2.0.0
         with:
@@ -341,4 +365,3 @@ jobs:
         if: failure()
         run: |
           cp -a logs /permabit/user/bunsen/artifacts/${{ inputs.logfile }}
-
