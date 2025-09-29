@@ -172,7 +172,7 @@ jobs:
 
       - name: Public build failure action
         if: failure()
-        run: ${{ inputs.public-build-fail-action }}
+        run: ${{ inputs.public-build-action-failure }}
 
       - name: Remove public build running label
         if: always()
@@ -218,7 +218,7 @@ jobs:
 
       - name: Public testing failure action
         if: failure()
-        run: ${{ inputs.public-tests-fail-action }}
+        run: ${{ inputs.public-tests-action-failure }}
 
       - name: Remove public testing running label
         if: always()
@@ -289,7 +289,7 @@ jobs:
 
       - name: Private build failure action
         if: failure()
-        run: ${{ inputs.private-build-fail-action }}
+        run: ${{ inputs.private-build-action-failure }}
 
       - name: Remove private build running label
         if: always()
