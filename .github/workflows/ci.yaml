@@ -244,12 +244,6 @@ jobs:
           label: public testing failed
           type: add
 
-      - name: Upload test results
-        if: failure()
-        uses: EnricoMi/publish-unit-test-result-action/composite@v1
-        with:
-          files: logs/**/*.xml
-
       - name: Upload logfiles
         if: failure()
         uses: actions/upload-artifact@v4
