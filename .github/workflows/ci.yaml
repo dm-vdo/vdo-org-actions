@@ -206,6 +206,10 @@ jobs:
       - name: Start Public
         run: echo "Public Testing Stage Starting"
 
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
       - name: Add public testing running
         uses: buildsville/add-remove-label@v2.0.0
         with:
@@ -316,6 +320,10 @@ jobs:
     steps:
       - name: Start Public
         run: echo "Private Testing Stage Starting"
+
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Add private testing running label
         uses: buildsville/add-remove-label@v2.0.0
