@@ -157,6 +157,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          allow-unsafe-pr-checkout: true
 
       - name: Remove untested label
         uses: buildsville/add-remove-label@v2.0.0
@@ -214,6 +215,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          allow-unsafe-pr-checkout: true
 
       - name: Add public testing running
         uses: buildsville/add-remove-label@v2.0.0
@@ -272,6 +274,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          allow-unsafe-pr-checkout: true
 
       - name: Remove untested label
         uses: buildsville/add-remove-label@v2.0.0
@@ -329,6 +332,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          allow-unsafe-pr-checkout: true
 
       - name: Add private testing running label
         uses: buildsville/add-remove-label@v2.0.0
